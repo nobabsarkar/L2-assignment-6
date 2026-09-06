@@ -1,0 +1,18 @@
+
+model User {
+    id  String  @id @default(uuid())
+    name String 
+    email String @unique
+    password           String?
+    googleId           String?      @unique
+    authProvider       AuthProvider @default(CREDENTIAL)
+    emailVerified      Boolean      @default(false)
+    role               Role         @default(CITIZEN)
+    status             UserStatus   @default(ACTIVE)
+    needPasswordChange Boolean      @default(false)
+    imageUrl           String       @default("")
+    createdAt          DateTime     @default(now())
+    updatedAt          DateTime     @updatedAt
+
+  @@map("users")
+}
