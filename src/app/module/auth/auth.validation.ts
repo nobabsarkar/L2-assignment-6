@@ -37,8 +37,29 @@ const LoginZodSchema = z.object({
     ),
 });
 
+const ForgotPasswordZodSchema = z.object({
+  email: z.email(),
+});
+
+const ResetPasswordZodSchema = z.object({
+  email: z.email(),
+  newPassword: z
+    .string()
+    .min(8, "Password Must Minimum 8 Characters")
+    .regex(/[A-Z]/, "Password must contain atleast 1 Uppercase Letter")
+    .regex(/[a-z]/, "Password must contain atleast 1 Lowercase Letter")
+    .regex(/[0-9]/, "Password must contain atleast 1 Number")
+    .regex(
+      /[^A-Za-z0-9]/,
+      "Password must contain atleast 1 Special Characters",
+    ),
+  otp: z.string().length(6),
+});
+
 export const UserValidation = {
   UserRegistrationZodSchema,
   UserEmailVerifyZodSchema,
   LoginZodSchema,
+  ForgotPasswordZodSchema,
+  ResetPasswordZodSchema,
 };

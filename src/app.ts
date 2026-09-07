@@ -10,6 +10,7 @@ import httpStatus from "http-status";
 import cors from "cors";
 import config from "./app/config";
 import cookieParser from "cookie-parser";
+import { UserRoutes } from "./app/module/user/user.route";
 
 const app: Application = express();
 
@@ -32,6 +33,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/api/v1/auth", AuthRoutes);
+app.use("/api/v1/user", UserRoutes);
 
 // Basic route
 app.get("/", async (req: Request, res: Response) => {
