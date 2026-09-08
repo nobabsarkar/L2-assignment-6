@@ -1,11 +1,9 @@
 import type { UploadApiResponse } from "cloudinary";
 import { cloudinary } from "../../lib/cloudinary";
 import { prisma } from "../../lib/prisma";
-
-const getAllUsers = async () => {
-  const users = await prisma.user.findMany();
-  return users;
-};
+import { AppError } from "../../utils/AppError";
+import type { Role } from "../../../../generated/prisma/enums";
+import httpStatus from "http-status";
 
 const uploadProfileImage = async (buffer: Buffer, userId: string) => {
   const currentUser = await prisma.user.findUnique({
@@ -65,7 +63,39 @@ const uploadProfileImage = async (buffer: Buffer, userId: string) => {
   return updatedUser;
 };
 
+const getAllUsers = async () => {
+  const users = await prisma.user.findMany();
+  return users;
+};
+
+const updateUserRole = async (userId: string, role: Role) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+  });
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  const updatedUser = await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      role,
+    },
+    omit: {
+      password: true,
+    },
+  });
+
+  return updatedUser;
+};
+
 export const UserService = {
   getAllUsers,
   uploadProfileImage,
+  updateUserRole,
 };

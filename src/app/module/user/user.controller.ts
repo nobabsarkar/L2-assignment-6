@@ -35,7 +35,22 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateUserRole = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { role } = req.body;
+
+  const result = await UserService.updateUserRole(id as string, role);
+
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: "User Role Updated Successfully",
+    data: result,
+  });
+});
+
 export const UserController = {
   uploadProfileImage,
   getAllUsers,
+  updateUserRole,
 };

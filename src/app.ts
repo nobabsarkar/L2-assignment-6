@@ -33,7 +33,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/api/v1/auth", AuthRoutes);
-app.use("/api/v1/user", UserRoutes);
+app.use("/api/v1/users", UserRoutes);
 
 // Basic route
 app.get("/", async (req: Request, res: Response) => {

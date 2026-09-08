@@ -5,6 +5,8 @@ import { prisma } from "../lib/prisma";
 import { catchAsync } from "../utils/catchAsync";
 import { jwtUtils } from "../utils/jwt";
 import type { Role } from "../../../generated/prisma/enums";
+import { AppError } from "../utils/AppError";
+import httpStatus from "http-status";
 
 export interface RequestUser {
   email: string;
@@ -54,14 +56,14 @@ export const auth = (...requiredRoles: Role[]) => {
     const user = await prisma.user.findUnique({
       where: {
         id: userId,
-        email,
-        name,
-        role,
       },
     });
 
     if (!user) {
-      throw new Error("User not found. Please log in again.");
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        "User not found. Please log in again.",
+      );
     }
 
     if (user.status === "BLOCKED") {
