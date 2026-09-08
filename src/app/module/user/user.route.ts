@@ -17,4 +17,10 @@ router.patch(
   UserController.uploadProfileImage,
 );
 
+router.get(
+  "/",
+  auth(Role.SUPER_ADMIN, Role.ADMIN, Role.CITIZEN),
+  UserController.getAllUsers,
+);
+
 export const UserRoutes = router;

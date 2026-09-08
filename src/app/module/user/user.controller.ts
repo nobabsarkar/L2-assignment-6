@@ -24,6 +24,18 @@ const uploadProfileImage = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.getAllUsers();
+
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: "User Retrieved Successfully",
+    data: result,
+  });
+});
+
 export const UserController = {
   uploadProfileImage,
+  getAllUsers,
 };
