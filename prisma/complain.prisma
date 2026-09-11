@@ -1,0 +1,20 @@
+model Complain {
+  id String @id @default(uuid())
+
+  title       String
+  description String
+  location    String
+
+
+  imageUrl      String?
+  imagePublicId String?
+
+  status ComplaintStatus @default(PENDING)
+
+  serviceFee Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("complains")
+}

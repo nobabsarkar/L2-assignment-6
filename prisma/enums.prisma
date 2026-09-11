@@ -14,3 +14,9 @@ enum UserStatus {
   ACTIVE
   BLOCKED
 }
+
+enum ComplaintStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
