@@ -4,7 +4,14 @@ import { complainService } from "./complain.service";
 import httpStatus from "http-status";
 
 const createComplain = catchAsync(async (req, res) => {
-  const result = await complainService.createComplain(req.body);
+  const image = req.file || null;
+  const payload = req.body;
+
+  const result = await complainService.createComplain(
+    payload,
+    req?.user?.userId as string,
+    image,
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,

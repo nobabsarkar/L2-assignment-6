@@ -7,5 +7,6 @@ export interface ICreateComplain {
   imageUrl?: string | null;
   imagePublicId?: string | null;
   status?: ComplaintStatus;
-  serviceFee?: number | null;
+  price: number;
+  userId: string;
 }
