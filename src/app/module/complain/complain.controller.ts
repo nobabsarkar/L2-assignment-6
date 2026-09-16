@@ -21,6 +21,39 @@ const createComplain = catchAsync(async (req, res) => {
   });
 });
 
+const getMyComplaints = catchAsync(async (req, res) => {
+  const userId = req?.user?.userId;
+
+  const result = await complainService.getMyComplaints(userId as string);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "Your complaints retrieved successfully",
+    data: result,
+  });
+});
+
+const updateComplain = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const userId = req?.user?.userId;
+
+  const result = await complainService.updateComplain(
+    id as string,
+    userId as string,
+    req.body,
+  );
+
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "Complaint updated successfully",
+    data: result,
+  });
+});
+
 export const complainController = {
   createComplain,
+  getMyComplaints,
+  updateComplain,
 };

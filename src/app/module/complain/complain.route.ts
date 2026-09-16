@@ -17,4 +17,12 @@ router.post(
   complainController.createComplain,
 );
 
+router.get(
+  "/my-complains",
+  auth(Role.CITIZEN),
+  complainController.getMyComplaints,
+);
+
+router.patch("/:id", auth(Role.CITIZEN), complainController.updateComplain);
+
 export const ComplainRoutes = router;

@@ -1,6 +1,13 @@
 import { cloudinary } from "../../lib/cloudinary";
 import { prisma } from "../../lib/prisma";
+import { AppError } from "../../utils/AppError";
 import type { ICreateComplain } from "./complain.interface";
+
+interface UpdateComplaintPayload {
+  title?: string;
+  description?: string;
+  location?: string;
+}
 
 const createComplain = async (
   payload: ICreateComplain,
@@ -50,6 +57,49 @@ const createComplain = async (
   return complain;
 };
 
+const getMyComplaints = async (userId: string) => {
+  const complaints = await prisma.complain.findMany({
+    where: {
+      userId: userId,
+    },
+    orderBy: {
+      createdAt: "asc",
+    },
+  });
+
+  return complaints;
+};
+
+const updateComplain = async (
+  id: string,
+  userId: string,
+  payload: UpdateComplaintPayload,
+) => {
+  const complaint = await prisma.complain.findFirst({
+    where: {
+      id,
+      userId,
+    },
+  });
+
+  if (!complaint) {
+    throw new AppError(404, "Complaint not found or you are not authorized");
+  }
+
+  const updatedComplaint = await prisma.complain.update({
+    where: {
+      id,
+    },
+    data: {
+      ...payload,
+    },
+  });
+
+  return updatedComplaint;
+};
+
 export const complainService = {
   createComplain,
+  getMyComplaints,
+  updateComplain,
 };

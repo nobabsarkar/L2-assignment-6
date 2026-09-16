@@ -64,7 +64,11 @@ const uploadProfileImage = async (buffer: Buffer, userId: string) => {
 };
 
 const getAllUsers = async () => {
-  const users = await prisma.user.findMany();
+  const users = await prisma.user.findMany({
+    omit: {
+      password: true,
+    },
+  });
   return users;
 };
 
