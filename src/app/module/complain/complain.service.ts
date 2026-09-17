@@ -1,13 +1,12 @@
+import type { ComplaintStatus } from "../../../../generated/prisma/enums";
 import { cloudinary } from "../../lib/cloudinary";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
-import type { ICreateComplain } from "./complain.interface";
-
-interface UpdateComplaintPayload {
-  title?: string;
-  description?: string;
-  location?: string;
-}
+import type {
+  ICreateComplain,
+  UpdateComplaintPayload,
+} from "./complain.interface";
+import httpStatus from "http-status";
 
 const createComplain = async (
   payload: ICreateComplain,
@@ -59,15 +58,29 @@ const createComplain = async (
 
 const getMyComplaints = async (userId: string) => {
   const complaints = await prisma.complain.findMany({
-    where: {
-      userId: userId,
-    },
     orderBy: {
       createdAt: "asc",
     },
   });
 
   return complaints;
+};
+
+const getSingleComplain = async (id: string) => {
+  const complain = await prisma.complain.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      user: {
+        omit: {
+          password: true,
+        },
+      },
+    },
+  });
+
+  return complain;
 };
 
 const updateComplain = async (
@@ -98,8 +111,45 @@ const updateComplain = async (
   return updatedComplaint;
 };
 
-export const complainService = {
+const deleteComplain = async (id: string) => {
+  const result = await prisma.complain.delete({
+    where: { id },
+  });
+
+  return result;
+};
+
+const adminUpdateComplainStatus = async (
+  complainId: string,
+  status: ComplaintStatus,
+) => {
+  const complain = await prisma.complain.findUnique({
+    where: {
+      id: complainId,
+    },
+  });
+
+  if (!complain) {
+    throw new AppError(httpStatus.NOT_FOUND, "Complain not found");
+  }
+
+  const result = await prisma.complain.update({
+    where: {
+      id: complainId,
+    },
+    data: {
+      status,
+    },
+  });
+
+  return result;
+};
+
+export const ComplainService = {
   createComplain,
   getMyComplaints,
   updateComplain,
+  getSingleComplain,
+  deleteComplain,
+  adminUpdateComplainStatus,
 };

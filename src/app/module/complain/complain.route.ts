@@ -2,10 +2,11 @@ import { Router } from "express";
 
 import { auth } from "../../middleware/checkAuth";
 import { Role } from "../../../../generated/prisma/enums";
-import { complainController } from "./complain.controller";
+
 import { upload } from "../../lib/multer";
 import { validateRequest } from "../../middleware/validateRequest";
 import { complainValidation } from "./complain.validation";
+import { ComplainController } from "./complain.controller";
 
 const router = Router();
 
@@ -14,15 +15,30 @@ router.post(
   auth(Role.CITIZEN),
   upload.single("image"),
   validateRequest(complainValidation.CreateComplainValidationSchema),
-  complainController.createComplain,
+  ComplainController.createComplain,
 );
 
 router.get(
   "/my-complains",
   auth(Role.CITIZEN),
-  complainController.getMyComplaints,
+  ComplainController.getMyComplaints,
 );
 
-router.patch("/:id", auth(Role.CITIZEN), complainController.updateComplain);
+router.get("/:id", ComplainController.getSingleComplain);
+
+router.patch(
+  "/:id",
+  auth(Role.CITIZEN),
+  validateRequest(complainValidation.UpdateComplainValidationSchema),
+  ComplainController.updateComplain,
+);
+
+router.delete("/:id", ComplainController.deleteComplain);
+
+router.patch(
+  "/admin-update-status/:id",
+  auth(Role.ADMIN, Role.SUPER_ADMIN),
+  ComplainController.adminUpdateComplainStatus,
+);
 
 export const ComplainRoutes = router;

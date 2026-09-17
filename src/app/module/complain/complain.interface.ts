@@ -10,3 +10,9 @@ export interface ICreateComplain {
   price: number;
   userId: string;
 }
+
+export interface UpdateComplaintPayload {
+  title?: string;
+  description?: string;
+  location?: string;
+}
