@@ -5,7 +5,6 @@ model Complain {
   description String
   location    String
 
-
   imageUrl      String?
   imagePublicId String?
 
@@ -13,8 +12,10 @@ model Complain {
 
   price Float?
 
-  userId String 
-  user User @relation(fields: [userId], references:[id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  payments Payment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
