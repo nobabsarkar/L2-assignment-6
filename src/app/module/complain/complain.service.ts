@@ -1,10 +1,10 @@
-import type { ComplaintStatus } from "../../../../generated/prisma/enums";
+import type { ComplainStatus } from "../../../../generated/prisma/enums";
 import { cloudinary } from "../../lib/cloudinary";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
 import type {
   ICreateComplain,
-  UpdateComplaintPayload,
+  UpdateComplainPayload,
 } from "./complain.interface";
 import httpStatus from "http-status";
 
@@ -56,14 +56,14 @@ const createComplain = async (
   return complain;
 };
 
-const getMyComplaints = async (userId: string) => {
-  const complaints = await prisma.complain.findMany({
+const getMyComplains = async (userId: string) => {
+  const complains = await prisma.complain.findMany({
     orderBy: {
       createdAt: "asc",
     },
   });
 
-  return complaints;
+  return complains;
 };
 
 const getSingleComplain = async (id: string) => {
@@ -86,20 +86,20 @@ const getSingleComplain = async (id: string) => {
 const updateComplain = async (
   id: string,
   userId: string,
-  payload: UpdateComplaintPayload,
+  payload: UpdateComplainPayload,
 ) => {
-  const complaint = await prisma.complain.findFirst({
+  const complain = await prisma.complain.findFirst({
     where: {
       id,
       userId,
     },
   });
 
-  if (!complaint) {
-    throw new AppError(404, "Complaint not found or you are not authorized");
+  if (!complain) {
+    throw new AppError(404, "Complain not found or you are not authorized");
   }
 
-  const updatedComplaint = await prisma.complain.update({
+  const updatedComplain = await prisma.complain.update({
     where: {
       id,
     },
@@ -108,7 +108,7 @@ const updateComplain = async (
     },
   });
 
-  return updatedComplaint;
+  return updatedComplain;
 };
 
 const deleteComplain = async (id: string) => {
@@ -121,7 +121,7 @@ const deleteComplain = async (id: string) => {
 
 const adminUpdateComplainStatus = async (
   complainId: string,
-  status: ComplaintStatus,
+  status: ComplainStatus,
 ) => {
   const complain = await prisma.complain.findUnique({
     where: {
@@ -147,7 +147,7 @@ const adminUpdateComplainStatus = async (
 
 export const ComplainService = {
   createComplain,
-  getMyComplaints,
+  getMyComplains,
   updateComplain,
   getSingleComplain,
   deleteComplain,

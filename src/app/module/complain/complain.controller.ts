@@ -21,15 +21,15 @@ const createComplain = catchAsync(async (req, res) => {
   });
 });
 
-const getMyComplaints = catchAsync(async (req, res) => {
+const getMyComplains = catchAsync(async (req, res) => {
   const userId = req?.user?.userId;
 
-  const result = await ComplainService.getMyComplaints(userId as string);
+  const result = await ComplainService.getMyComplains(userId as string);
 
   sendResponse(res, {
     success: true,
     statusCode: 200,
-    message: "Your complaints retrieved successfully",
+    message: "Your complains retrieved successfully",
     data: result,
   });
 });
@@ -47,7 +47,7 @@ const updateComplain = catchAsync(async (req, res) => {
   sendResponse(res, {
     success: true,
     statusCode: 200,
-    message: "Complaint updated successfully",
+    message: "Complain updated successfully",
     data: result,
   });
 });
@@ -60,7 +60,7 @@ const getSingleComplain = catchAsync(async (req, res) => {
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: "Complaint retrieved successfully",
+    message: "Complain retrieved successfully",
     data: result,
   });
 });
@@ -90,14 +90,14 @@ const adminUpdateComplainStatus = catchAsync(async (req, res) => {
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: "Complaint status updated successfully",
+    message: "Complain status updated successfully",
     data: result,
   });
 });
 
 export const ComplainController = {
   createComplain,
-  getMyComplaints,
+  getMyComplains,
   updateComplain,
   getSingleComplain,
   deleteComplain,

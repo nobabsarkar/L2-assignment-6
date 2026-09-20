@@ -162,7 +162,7 @@ const verifyUserEmail = async (payload: IVerifyEmailPayload) => {
   await transporter.sendMail({
     from: config.email_sender,
     to: email,
-    subject: "Welcome To City Complaint & Service Platform",
+    subject: "Welcome To City Complain & Service Platform",
     html,
   });
 

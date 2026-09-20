@@ -1,4 +1,4 @@
-import type { ComplaintStatus } from "../../../../generated/prisma/enums";
+import type { ComplainStatus } from "../../../../generated/prisma/enums";
 
 export interface ICreateComplain {
   title: string;
@@ -6,12 +6,12 @@ export interface ICreateComplain {
   location: string;
   imageUrl?: string | null;
   imagePublicId?: string | null;
-  status?: ComplaintStatus;
+  status?: ComplainStatus;
   price: number;
   userId: string;
 }
 
-export interface UpdateComplaintPayload {
+export interface UpdateComplainPayload {
   title?: string;
   description?: string;
   location?: string;

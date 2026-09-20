@@ -23,12 +23,12 @@ app.use(
   }),
 );
 
-// Enable URL-encoded form data parsing
-app.use(express.urlencoded({ extended: true }));
-
 // Middleware to parse JSON bodies
 app.use(express.json());
 app.use(cookieParser());
+
+// Enable URL-encoded form data parsing
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello, World!");
@@ -43,7 +43,7 @@ app.use("/api/v1/payments", PaymentRoutes);
 app.get("/", async (req: Request, res: Response) => {
   res.status(httpStatus.OK).json({
     success: true,
-    message: "Welcome to City Complaint & Service Platform",
+    message: "Welcome to City Complain & Service Platform",
   });
 });
 

@@ -15,13 +15,13 @@ enum UserStatus {
   BLOCKED
 }
 
-enum ComplaintStatus {
+enum ComplainStatus {
   PENDING
   APPROVED
   REJECTED
 }
 
-enum PaymentStatus {
+enum PaymenStatus {
   PENDING
   COMPLETED
   FAILED

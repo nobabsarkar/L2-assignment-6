@@ -2,7 +2,7 @@ model Payment {
   id            String        @id @default(uuid())
   transactionId String        @unique
   amount        Float
-  status        PaymentStatus
+  status        PaymenStatus
 
   complainId String
   complain   Complain @relation(fields: [complainId], references: [id], onDelete: Cascade)

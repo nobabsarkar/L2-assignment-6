@@ -8,7 +8,7 @@ model Complain {
   imageUrl      String?
   imagePublicId String?
 
-  status ComplaintStatus @default(PENDING)
+  status ComplainStatus @default(PENDING)
 
   price Float?
 

@@ -12,6 +12,7 @@ const UpdateComplainValidationSchema = z.object({
   description: z.string().optional(),
   location: z.string().optional(),
   price: z.number().optional(),
+  status: z.enum(["PENDING", "APPROVED", "REJECTED"]).optional(),
 });
 
 export const complainValidation = {

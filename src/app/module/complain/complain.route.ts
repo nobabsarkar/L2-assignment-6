@@ -21,7 +21,7 @@ router.post(
 router.get(
   "/my-complains",
   auth(Role.CITIZEN),
-  ComplainController.getMyComplaints,
+  ComplainController.getMyComplains,
 );
 
 router.get("/:id", ComplainController.getSingleComplain);

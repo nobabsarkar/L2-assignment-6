@@ -4,34 +4,39 @@ import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
 import httpStatus from "http-status";
 
-const initiateComplaintPayment = async (complainId: string, userId: string) => {
-  // 1. User খুঁজে বের করা
+const initiateComplainPayment = async (complainId: string, userId: string) => {
   const user = await prisma.user.findUniqueOrThrow({
     where: {
       id: userId,
     },
   });
 
-  // 2. Complaint খুঁজে বের করা
   const complain = await prisma.complain.findUniqueOrThrow({
     where: {
       id: complainId,
     },
   });
 
-  // 3. Complaint-এর owner কিনা check
+  console.log(complain);
+
   if (complain.userId !== userId) {
     throw new AppError(
       httpStatus.FORBIDDEN,
-      "You can only pay for your own complaint.",
+      "You can only pay for your own complain.",
     );
   }
 
-  // 4. Price আছে কিনা check
+  if (complain.status !== "APPROVED") {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Your complain is not approved yet. You can not payment.",
+    );
+  }
+
   if (!complain.price || complain.price <= 0) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "This complaint does not require payment.",
+      "This complain does not require payment.",
     );
   }
 
@@ -47,11 +52,11 @@ const initiateComplaintPayment = async (complainId: string, userId: string) => {
     currency: "BDT",
     tran_id: tranId,
 
-    success_url: `${config.app_url}/api/v1/payments/complaint-confirm?complainId=${complainId}&tranId=${tranId}&status=success`,
+    success_url: `${config.app_url}/api/v1/payments/complain-confirm?complainId=${complainId}&tranId=${tranId}&status=success`,
 
-    fail_url: `${config.app_url}/api/v1/payments/complaint-confirm?complainId=${complainId}&tranId=${tranId}&status=fail`,
+    fail_url: `${config.app_url}/api/v1/payments/complain-confirm?complainId=${complainId}&tranId=${tranId}&status=fail`,
 
-    cancel_url: `${config.app_url}/api/v1/payments/complaint-confirm?complainId=${complainId}&tranId=${tranId}&status=cancel`,
+    cancel_url: `${config.app_url}/api/v1/payments/complain-confirm?complainId=${complainId}&tranId=${tranId}&status=cancel`,
 
     cus_name: user.name,
     cus_email: user.email,
@@ -93,6 +98,59 @@ const initiateComplaintPayment = async (complainId: string, userId: string) => {
   return data?.GatewayPageURL;
 };
 
+const validatePayment = async (
+  complainId: string,
+  tranId: string,
+  status: string,
+  payload: Record<string, unknown>,
+) => {
+  const response = await axios.post(
+    `https://sandbox.sslcommerz.com/validator/api/validationserverAPI.php?val_id=${payload.val_id}&store_id=${config.ssl_commerz_store_id}&store_passwd=${config.ssl_commerz_store_password}&format=json`,
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    },
+  );
+
+  const data = await response.data;
+
+  if (data.status === "VALID") {
+    await prisma.complain.update({
+      where: {
+        id: complainId,
+      },
+      data: {
+        status: "APPROVED",
+      },
+    });
+
+    await prisma.payment.update({
+      where: {
+        transactionId: tranId,
+      },
+      data: {
+        status: "COMPLETED",
+        paidAt: new Date(),
+      },
+    });
+  }
+
+  return status;
+};
+
+const getAllPayments = async () => {
+  const result = await prisma.payment.findMany({
+    orderBy: {
+      createdAt: "asc",
+    },
+  });
+
+  return result;
+};
+
 export const paymentService = {
-  initiateComplaintPayment,
+  initiateComplainPayment,
+  validatePayment,
+  getAllPayments,
 };
