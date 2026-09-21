@@ -139,6 +139,19 @@ const validatePayment = async (
   return status;
 };
 
+const getUserPayments = async (userId: string) => {
+  const result = await prisma.payment.findMany({
+    where: {
+      userId: userId,
+    },
+    orderBy: {
+      createdAt: "asc",
+    },
+  });
+
+  return result;
+};
+
 const getAllPayments = async () => {
   const result = await prisma.payment.findMany({
     orderBy: {
@@ -152,5 +165,6 @@ const getAllPayments = async () => {
 export const paymentService = {
   initiateComplainPayment,
   validatePayment,
+  getUserPayments,
   getAllPayments,
 };

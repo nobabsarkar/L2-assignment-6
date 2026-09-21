@@ -24,6 +24,12 @@ router.get(
   ComplainController.getMyComplains,
 );
 
+router.get(
+  "/admin-get-all-complains",
+  auth(Role.ADMIN, Role.SUPER_ADMIN),
+  ComplainController.adminGetAllComplains,
+);
+
 router.get("/:id", ComplainController.getSingleComplain);
 
 router.patch(

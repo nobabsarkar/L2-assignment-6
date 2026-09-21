@@ -14,6 +14,12 @@ router.post(
 router.post("/complain-confirm", paymentController.verifyPayment);
 
 router.get(
+  "/user-payments",
+  auth(Role.CITIZEN),
+  paymentController.getUserPayments,
+);
+
+router.get(
   "/get-all-payments",
   auth(Role.ADMIN, Role.SUPER_ADMIN),
   paymentController.getAllPayments,

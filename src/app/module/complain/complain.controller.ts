@@ -24,12 +24,12 @@ const createComplain = catchAsync(async (req, res) => {
 const getMyComplains = catchAsync(async (req, res) => {
   const userId = req?.user?.userId;
 
-  const result = await ComplainService.getMyComplains(userId as string);
+  const result = await ComplainService.citezenOwnComplain(userId as string);
 
   sendResponse(res, {
     success: true,
     statusCode: 200,
-    message: "Your complains retrieved successfully",
+    message: "Complain retrieved successfully",
     data: result,
   });
 });
@@ -78,6 +78,17 @@ const deleteComplain = catchAsync(async (req, res) => {
   });
 });
 
+const adminGetAllComplains = catchAsync(async (req, res) => {
+  const result = await ComplainService.adminGetAllComplains();
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "admin retrieved complain successfully",
+    data: result,
+  });
+});
+
 const adminUpdateComplainStatus = catchAsync(async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
@@ -101,5 +112,6 @@ export const ComplainController = {
   updateComplain,
   getSingleComplain,
   deleteComplain,
+  adminGetAllComplains,
   adminUpdateComplainStatus,
 };

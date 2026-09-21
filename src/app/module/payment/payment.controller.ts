@@ -49,6 +49,19 @@ const verifyPayment = catchAsync(async (req, res) => {
   });
 });
 
+const getUserPayments = catchAsync(async (req, res) => {
+  const userId = req.body?.userId;
+
+  const result = await paymentService.getUserPayments(userId);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "User payments retrieved successfully",
+    data: result,
+  });
+});
+
 const getAllPayments = catchAsync(async (req, res) => {
   const result = await paymentService.getAllPayments();
 
@@ -63,5 +76,6 @@ const getAllPayments = catchAsync(async (req, res) => {
 export const paymentController = {
   initiatePayment,
   verifyPayment,
+  getUserPayments,
   getAllPayments,
 };

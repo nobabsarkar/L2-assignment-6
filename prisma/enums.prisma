@@ -26,3 +26,9 @@ enum PaymenStatus {
   COMPLETED
   FAILED
 }
+
+enum AssignStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}

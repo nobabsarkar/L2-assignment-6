@@ -56,8 +56,11 @@ const createComplain = async (
   return complain;
 };
 
-const getMyComplains = async (userId: string) => {
+const citezenOwnComplain = async (userId: string) => {
   const complains = await prisma.complain.findMany({
+    where: {
+      userId,
+    },
     orderBy: {
       createdAt: "asc",
     },
@@ -119,6 +122,16 @@ const deleteComplain = async (id: string) => {
   return result;
 };
 
+const adminGetAllComplains = async () => {
+  const result = await prisma.complain.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return result;
+};
+
 const adminUpdateComplainStatus = async (
   complainId: string,
   status: ComplainStatus,
@@ -147,9 +160,10 @@ const adminUpdateComplainStatus = async (
 
 export const ComplainService = {
   createComplain,
-  getMyComplains,
+  citezenOwnComplain,
   updateComplain,
   getSingleComplain,
   deleteComplain,
+  adminGetAllComplains,
   adminUpdateComplainStatus,
 };
