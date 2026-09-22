@@ -34,7 +34,28 @@ const getMyAssignments = catchAsync(async (req, res) => {
   });
 });
 
+const startWork = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  const serviceWorkerId = req.user?.userId;
+
+  const result = await AssignService.startWork(
+    id as string,
+    serviceWorkerId as string,
+    status,
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Work started successfully",
+    data: result,
+  });
+});
+
 export const AssignController = {
   assignServiceWorker,
   getMyAssignments,
+  startWork,
 };

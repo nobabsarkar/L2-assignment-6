@@ -20,4 +20,11 @@ router.get(
   AssignController.getMyAssignments,
 );
 
+router.patch(
+  "/:id",
+  auth(Role.SERVICE_WORKER),
+  validateRequest(assignValidation.updateAssginValidation),
+  AssignController.startWork,
+);
+
 export const AssignRoutes = router;
