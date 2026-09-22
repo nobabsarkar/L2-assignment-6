@@ -85,6 +85,10 @@ const getMyAssignments = async (serviceWorkerId: string) => {
     orderBy: {
       createdAt: "desc",
     },
+    omit: {
+      serviceWorkerId: true,
+      complainId: true,
+    },
   });
 
   return result;
