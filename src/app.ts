@@ -13,6 +13,7 @@ import cookieParser from "cookie-parser";
 import { UserRoutes } from "./app/module/user/user.route";
 import { ComplainRoutes } from "./app/module/complain/complain.route";
 import { PaymentRoutes } from "./app/module/payment/payment.route";
+import { AssignRoutes } from "./app/module/assign/assign.route";
 
 const app: Application = express();
 
@@ -38,6 +39,7 @@ app.use("/api/v1/auth", AuthRoutes);
 app.use("/api/v1/users", UserRoutes);
 app.use("/api/v1/complains", ComplainRoutes);
 app.use("/api/v1/payments", PaymentRoutes);
+app.use("/api/v1/assigns", AssignRoutes);
 
 // Basic route
 app.get("/", async (req: Request, res: Response) => {

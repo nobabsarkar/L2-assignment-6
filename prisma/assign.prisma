@@ -1,20 +1,18 @@
-model Assign{
+model Assign {
+  id     String       @id @default(uuid())
+  status AssignStatus @default(PENDING)
 
-    id String @id @default(uuid())
-    status AssignStatus @default(PENDING)
+  complainId String
+  complain   Complain @relation(fields: [complainId], references: [id], onDelete: Cascade)
 
-    complainId String
-    complain Complain @relation(fields: [complainId], references: [id], onDelete: Cascade)
+  serviceWorkerId String
+  serviceWorker   User   @relation("ServiceWorkerAssign", fields: [serviceWorkerId], references: [id], onDelete: Cascade)
 
-    serviceWorkerId String 
-    serviceWorker User @relation("ServiceWorkerAssign",fields: [serviceWorkerId], references: [id], onDelete: Cascade)
+  // adminId String
+  // admin   User   @relation("AdminAssign", fields: [adminId], references: [id], onDelete: Cascade)
 
-    adminId String 
-    admin User @relation("AdminAssign",fields: [adminId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    @@map("assigns")
+  @@map("assigns")
 }

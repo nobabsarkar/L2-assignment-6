@@ -1,6 +1,6 @@
 model Payment {
-  id            String        @id @default(uuid())
-  transactionId String        @unique
+  id            String       @id @default(uuid())
+  transactionId String       @unique
   amount        Float
   status        PaymenStatus
 
