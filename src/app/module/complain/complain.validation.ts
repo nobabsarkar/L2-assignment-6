@@ -16,9 +16,7 @@ const UpdateComplainValidationSchema = z.object({
 });
 
 const completeWorkValidationSchema = z.object({
-  proofDescription: z
-    .string()
-    .min(5, "Proof description must be at least 5 characters"),
+  proofDescription: z.string().min(1, "Proof description is required"),
 });
 
 export const complainValidation = {

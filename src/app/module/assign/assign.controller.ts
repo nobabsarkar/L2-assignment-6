@@ -59,7 +59,7 @@ const completeWork = catchAsync(async (req, res) => {
 
   const serviceWorkerId = req.user?.userId;
 
-  const { proofDescription } = JSON.parse(req.body.data);
+  const { proofDescription } = req.body;
 
   const result = await AssignService.completeWork(
     assignId as string,
