@@ -15,7 +15,14 @@ const UpdateComplainValidationSchema = z.object({
   status: z.enum(["PENDING", "APPROVED", "REJECTED"]).optional(),
 });
 
+const completeWorkValidationSchema = z.object({
+  proofDescription: z
+    .string()
+    .min(5, "Proof description must be at least 5 characters"),
+});
+
 export const complainValidation = {
   CreateComplainValidationSchema,
   UpdateComplainValidationSchema,
+  completeWorkValidationSchema,
 };

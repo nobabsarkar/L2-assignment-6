@@ -54,8 +54,31 @@ const startWork = catchAsync(async (req, res) => {
   });
 });
 
+const completeWork = catchAsync(async (req, res) => {
+  const { assignId } = req.params;
+
+  const serviceWorkerId = req.user?.userId;
+
+  const { proofDescription } = JSON.parse(req.body.data);
+
+  const result = await AssignService.completeWork(
+    assignId as string,
+    serviceWorkerId as string,
+    proofDescription,
+    req.file!,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Work completed and proof submitted successfully",
+    data: result,
+  });
+});
+
 export const AssignController = {
   assignServiceWorker,
   getMyAssignments,
   startWork,
+  completeWork,
 };

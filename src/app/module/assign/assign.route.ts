@@ -4,6 +4,8 @@ import { Role } from "../../../../generated/prisma/enums";
 import { AssignController } from "./assign.controller";
 import { validateRequest } from "../../middleware/validateRequest";
 import { assignValidation } from "./assign.validation";
+import { upload } from "../../lib/multer";
+import { complainValidation } from "../complain/complain.validation";
 
 const router = Router();
 
@@ -25,6 +27,14 @@ router.patch(
   auth(Role.SERVICE_WORKER),
   validateRequest(assignValidation.updateAssginValidation),
   AssignController.startWork,
+);
+
+router.patch(
+  "/:assignId/complete-work",
+  auth(Role.SERVICE_WORKER),
+  upload.single("proofImage"),
+  validateRequest(complainValidation.completeWorkValidationSchema),
+  AssignController.completeWork,
 );
 
 export const AssignRoutes = router;
