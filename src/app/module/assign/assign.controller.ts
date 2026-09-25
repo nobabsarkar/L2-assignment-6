@@ -56,7 +56,6 @@ const startWork = catchAsync(async (req, res) => {
 
 const completeWork = catchAsync(async (req, res) => {
   const { assignId } = req.params;
-
   const serviceWorkerId = req.user?.userId;
 
   const { proofDescription } = req.body;

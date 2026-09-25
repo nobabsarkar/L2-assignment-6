@@ -33,7 +33,7 @@ router.patch(
   "/:assignId/complete-work",
   auth(Role.SERVICE_WORKER),
   upload.single("proofImage"),
-  // validateRequest(complainValidation.completeWorkValidationSchema),
+  validateRequest(complainValidation.completeWorkValidationSchema),
   AssignController.completeWork,
 );
 

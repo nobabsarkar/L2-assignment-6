@@ -6,6 +6,8 @@ export const validateRequest = (zodSchema: z.ZodObject) => {
   return catchAsync((req: Request, res: Response, next: NextFunction) => {
     let payload = req.body ?? {};
 
+    console.log(payload, "payload");
+
     // 1. Parse the JSON string from Postman
     if (typeof payload.data === "string") {
       payload = JSON.parse(payload.data);

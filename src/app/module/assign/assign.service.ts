@@ -205,9 +205,6 @@ const completeWork = async (
       data: {
         status: "COMPLETED",
       },
-      include: {
-        complain: true,
-      },
     });
 
     return {
