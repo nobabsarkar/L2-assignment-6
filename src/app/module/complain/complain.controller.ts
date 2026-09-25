@@ -79,7 +79,7 @@ const deleteComplain = catchAsync(async (req, res) => {
 });
 
 const adminGetAllComplains = catchAsync(async (req, res) => {
-  const result = await ComplainService.adminGetAllComplains();
+  const result = await ComplainService.adminGetAllComplains(req.query);
 
   sendResponse(res, {
     statusCode: 200,

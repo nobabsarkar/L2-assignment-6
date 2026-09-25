@@ -1,4 +1,6 @@
 import type { ComplainStatus } from "../../../../generated/prisma/enums";
+import type { ComplainWhereInput } from "../../../../generated/prisma/models";
+import type { IQuery } from "../../interface";
 import { cloudinary } from "../../lib/cloudinary";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
@@ -122,10 +124,55 @@ const deleteComplain = async (id: string) => {
   return result;
 };
 
-const adminGetAllComplains = async () => {
+const adminGetAllComplains = async (query: IQuery) => {
+  const limit = query.limit ? Number(query.limit) : 10;
+  const page = query.page ? Number(query.page) : 1;
+  const skip = (page - 1) * limit;
+  const sortBy = query.sortBy ? query.sortBy : "createdAt";
+  const sortOrder = query.sortOrder ? query.sortOrder : "desc";
+
+  const andConditions: ComplainWhereInput[] = [];
+
+  // Searching
+  if (query.searchTerm) {
+    andConditions.push({
+      OR: [
+        { title: { contains: query.searchTerm, mode: "insensitive" } },
+        { location: { contains: query.searchTerm, mode: "insensitive" } },
+      ],
+    });
+  }
+
+  // filtering
+  if (query.status) {
+    andConditions.push({
+      status: query.status.toUpperCase() as ComplainStatus,
+    });
+  }
+
+  if (query.minPrice || query.maxPrice) {
+    andConditions.push({
+      price: {
+        ...(query.minPrice && {
+          gte: Number(query.minPrice),
+        }),
+        ...(query.maxPrice && {
+          lte: Number(query.maxPrice),
+        }),
+      },
+    });
+  }
+
   const result = await prisma.complain.findMany({
+    where: {
+      AND: andConditions,
+    },
+
+    take: limit,
+    skip: skip,
+
     orderBy: {
-      createdAt: "desc",
+      [sortBy]: sortOrder,
     },
   });
 
