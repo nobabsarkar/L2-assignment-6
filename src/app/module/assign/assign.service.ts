@@ -181,11 +181,11 @@ const completeWork = async (
 
   const uploadedImage = await sendImageToCloudinary(
     proofImage.buffer,
-    "citycare/complaint-proofs",
+    "citycare/complain-proofs",
   );
 
   const result = await prisma.$transaction(async (tx) => {
-    // Complaint → RESOLVED
+    // Complain → RESOLVED
     const complain = await tx.complain.update({
       where: {
         id: assignment.complainId,
@@ -216,9 +216,38 @@ const completeWork = async (
   return result;
 };
 
+const citizenSeeComplainWorkStatus = async (citizenId: string) => {
+  const result = await prisma.assign.findMany({
+    where: {
+      complain: {
+        userId: citizenId,
+      },
+    },
+    include: {
+      complain: true,
+
+      serviceWorker: {
+        omit: {
+          password: true,
+        },
+      },
+    },
+    omit: {
+      complainId: true,
+      serviceWorkerId: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return result;
+};
+
 export const AssignService = {
   assignServiceWorker,
   getMyAssignments,
   startWork,
   completeWork,
+  citizenSeeComplainWorkStatus,
 };

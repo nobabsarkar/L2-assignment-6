@@ -37,4 +37,10 @@ router.patch(
   AssignController.completeWork,
 );
 
+router.get(
+  "/citizen-complain-status",
+  auth(Role.CITIZEN),
+  AssignController.citizenSeeComplainWorkStatus,
+);
+
 export const AssignRoutes = router;

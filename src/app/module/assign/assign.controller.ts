@@ -75,9 +75,25 @@ const completeWork = catchAsync(async (req, res) => {
   });
 });
 
+const citizenSeeComplainWorkStatus = catchAsync(async (req, res) => {
+  const citizenId = req.user?.userId;
+
+  const result = await AssignService.citizenSeeComplainWorkStatus(
+    citizenId as string,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Citizen complain work status retrieved successfully",
+    data: result,
+  });
+});
+
 export const AssignController = {
   assignServiceWorker,
   getMyAssignments,
   startWork,
   completeWork,
+  citizenSeeComplainWorkStatus,
 };
