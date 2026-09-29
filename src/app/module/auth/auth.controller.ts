@@ -1,7 +1,6 @@
 import { AppError } from "../../utils/AppError";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
-import type { IRequestUser } from "./auth.interface";
 import { AuthService } from "./auth.service";
 import httpStatus from "http-status";
 
@@ -109,6 +108,7 @@ const refreshToken = catchAsync(async (req, res) => {
     sameSite: "none",
     maxAge: 1000 * 60 * 60 * 24, // 24 hour or 1 day
   });
+
   res.cookie("refreshToken", newRefreshToken, {
     httpOnly: true,
     secure: false,
