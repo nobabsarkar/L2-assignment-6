@@ -9,11 +9,8 @@ const router = Router();
 
 router.patch(
   "/profile-image",
-
   auth(Role.SUPER_ADMIN, Role.ADMIN, Role.CITIZEN),
-
   upload.single("profileImage"),
-
   UserController.uploadProfileImage,
 );
 
