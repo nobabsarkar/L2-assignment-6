@@ -1,3 +1,4 @@
+import config from "../../config";
 import { AppError } from "../../utils/AppError";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
@@ -26,14 +27,14 @@ const verifyUserEmail = catchAsync(async (req, res) => {
 
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    secure: false,
-    sameSite: "none",
+    secure: config.node_env === "development" ? false : true,
+    sameSite: config.node_env === "development" ? "lax" : "none",
     maxAge: 1000 * 60 * 60 * 24, // 24 hour or 1 day
   });
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: false,
-    sameSite: "none",
+    secure: config.node_env === "development" ? false : true,
+    sameSite: config.node_env === "development" ? "lax" : "none",
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
   });
 
@@ -57,14 +58,14 @@ const loginUser = catchAsync(async (req, res) => {
 
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    secure: false,
-    sameSite: "none",
+    secure: config.node_env === "development" ? false : true,
+    sameSite: config.node_env === "development" ? "lax" : "none",
     maxAge: 1000 * 60 * 60 * 24, // 24 hour or 1 day
   });
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: false,
-    sameSite: "none",
+    secure: config.node_env === "development" ? false : true,
+    sameSite: config.node_env === "development" ? "lax" : "none",
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
   });
 
@@ -104,15 +105,15 @@ const refreshToken = catchAsync(async (req, res) => {
 
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    secure: false,
-    sameSite: "none",
+    secure: config.node_env === "development" ? false : true,
+    sameSite: config.node_env === "development" ? "lax" : "none",
     maxAge: 1000 * 60 * 60 * 24, // 24 hour or 1 day
   });
 
   res.cookie("refreshToken", newRefreshToken, {
     httpOnly: true,
-    secure: false,
-    sameSite: "none",
+    secure: config.node_env === "development" ? false : true,
+    sameSite: config.node_env === "development" ? "lax" : "none",
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
   });
 
@@ -153,6 +154,18 @@ const resetPassword = catchAsync(async (req, res) => {
   });
 });
 
+const logout = catchAsync(async (req, res) => {
+  res.clearCookie("accessToken");
+  res.clearCookie("refreshToken");
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `User logged out successfully`,
+    data: null,
+  });
+});
+
 export const AuthController = {
   registerUser,
   verifyUserEmail,
@@ -161,4 +174,5 @@ export const AuthController = {
   refreshToken,
   forgotPassword,
   resetPassword,
+  logout,
 };
