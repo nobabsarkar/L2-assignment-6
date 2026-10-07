@@ -27,7 +27,7 @@ router.post(
 
 router.get(
   "/me",
-  auth(Role.SUPER_ADMIN, Role.ADMIN, Role.CITIZEN),
+  auth(Role.SUPER_ADMIN, Role.ADMIN, Role.CITIZEN, Role.SERVICE_WORKER),
   AuthController.getMe,
 );
 
