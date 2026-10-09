@@ -9,13 +9,17 @@ const router = Router();
 
 router.patch(
   "/profile-image",
-  auth(Role.SUPER_ADMIN, Role.ADMIN, Role.CITIZEN),
+  auth(Role.SUPER_ADMIN, Role.ADMIN, Role.CITIZEN, Role.SERVICE_WORKER),
   upload.single("profileImage"),
   UserController.uploadProfileImage,
 );
 
 router.get("/", auth(Role.SUPER_ADMIN, Role.ADMIN), UserController.getAllUsers);
 
-router.patch("/:id", auth(Role.SUPER_ADMIN), UserController.updateUserRole);
+router.patch(
+  "/:id",
+  auth(Role.SUPER_ADMIN, Role.ADMIN),
+  UserController.updateUserRole,
+);
 
 export const UserRoutes = router;
