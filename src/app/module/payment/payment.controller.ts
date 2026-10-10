@@ -36,9 +36,7 @@ const verifyPayment = catchAsync(async (req, res) => {
   );
 
   if (result === "success") {
-    res.redirect(
-      `http://localhost:3000/tenant-dashboard/payment-success/${tranId}`,
-    );
+    res.redirect(`http://localhost:3000/payment-success/${tranId}`);
   }
 
   sendResponse(res, {
@@ -76,6 +74,7 @@ const getAllPayments = catchAsync(async (req, res) => {
 export const paymentController = {
   initiatePayment,
   verifyPayment,
+
   getUserPayments,
   getAllPayments,
 };

@@ -17,8 +17,6 @@ const initiateComplainPayment = async (complainId: string, userId: string) => {
     },
   });
 
-  console.log(complain);
-
   if (complain.userId !== userId) {
     throw new AppError(
       httpStatus.FORBIDDEN,
