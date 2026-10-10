@@ -14,6 +14,38 @@ import express2 from "express";
 // src/app/module/auth/auth.route.ts
 import { Router } from "express";
 
+// src/app/config/index.ts
+import dotenv from "dotenv";
+import path from "path";
+dotenv.config({ path: path.join(process.cwd(), ".env") });
+var config_default = {
+  node_env: process.env.NODE_ENV,
+  port: process.env.PORT,
+  app_url: process.env.APP_URL,
+  database_url: process.env.DATABASE_URL,
+  frontend_url: process.env.FRONTEND_URL,
+  bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,
+  jwt_access_secret: process.env.JWT_ACCESS_SECRET,
+  jwt_refresh_secret: process.env.JWT_REFRESH_SECRET,
+  jwt_access_expires_in: process.env.JWT_ACCESS_EXPIRES_IN,
+  jwt_refresh_expires_in: process.env.JWT_REFRESH_EXPIRES_IN,
+  super_admin_name: process.env.SUPER_ADMIN_NAME,
+  super_admin_email: process.env.SUPER_ADMIN_EMAIL,
+  super_admin_password: process.env.SUPER_ADMIN_PASSWORD,
+  redis_user: process.env.REDIS_USER,
+  redis_password: process.env.REDIS_PASSWORD,
+  redis_host: process.env.REDIS_HOST,
+  redis_port: process.env.REDIS_PORT,
+  smtp_user: process.env.SMTP_USER,
+  smtp_password: process.env.SMTP_PASSWORD,
+  email_sender: process.env.EMAIL_SENDER,
+  cloudinary_cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  cloudinary_cloud_key: process.env.CLOUDINARY_API_KEY,
+  cloudinary_cloud_secret: process.env.CLOUDINARY_API_SECRET,
+  ssl_commerz_store_id: process.env.SSL_COMMERZ_STORE_ID,
+  ssl_commerz_store_password: process.env.SSL_COMMERZ_STORE_PASSWORD
+};
+
 // src/app/utils/AppError.ts
 var AppError = class extends Error {
   //
@@ -60,7 +92,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 
 // generated/prisma/client.ts
 import "process";
-import * as path from "path";
+import * as path2 from "path";
 import { fileURLToPath } from "url";
 import "@prisma/client/runtime/client";
 
@@ -250,7 +282,7 @@ var NullsOrder = {
 var defineExtension = runtime2.Extensions.defineExtension;
 
 // generated/prisma/client.ts
-globalThis["__dirname"] = path.dirname(fileURLToPath(import.meta.url));
+globalThis["__dirname"] = path2.dirname(fileURLToPath(import.meta.url));
 var PrismaClient = getPrismaClientClass();
 
 // src/app/lib/prisma.ts
@@ -260,40 +292,6 @@ var prisma = new PrismaClient({ adapter });
 
 // src/app/lib/redis.ts
 import { createClient } from "redis";
-
-// src/app/config/index.ts
-import dotenv from "dotenv";
-import path2 from "path";
-dotenv.config({ path: path2.join(process.cwd(), ".env") });
-var config_default = {
-  node_env: process.env.NODE_ENV,
-  port: process.env.PORT,
-  app_url: process.env.APP_URL,
-  database_url: process.env.DATABASE_URL,
-  frontend_url: process.env.FRONTEND_URL,
-  bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,
-  jwt_access_secret: process.env.JWT_ACCESS_SECRET,
-  jwt_refresh_secret: process.env.JWT_REFRESH_SECRET,
-  jwt_access_expires_in: process.env.JWT_ACCESS_EXPIRES_IN,
-  jwt_refresh_expires_in: process.env.JWT_REFRESH_EXPIRES_IN,
-  super_admin_name: process.env.SUPER_ADMIN_NAME,
-  super_admin_email: process.env.SUPER_ADMIN_EMAIL,
-  super_admin_password: process.env.SUPER_ADMIN_PASSWORD,
-  redis_user: process.env.REDIS_USER,
-  redis_password: process.env.REDIS_PASSWORD,
-  redis_host: process.env.REDIS_HOST,
-  redis_port: process.env.REDIS_PORT,
-  smtp_user: process.env.SMTP_USER,
-  smtp_password: process.env.SMTP_PASSWORD,
-  email_sender: process.env.EMAIL_SENDER,
-  cloudinary_cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  cloudinary_cloud_key: process.env.CLOUDINARY_API_KEY,
-  cloudinary_cloud_secret: process.env.CLOUDINARY_API_SECRET,
-  ssl_commerz_store_id: process.env.SSL_COMMERZ_STORE_ID,
-  ssl_commerz_store_password: process.env.SSL_COMMERZ_STORE_PASSWORD
-};
-
-// src/app/lib/redis.ts
 var redisClient = createClient({
   username: config_default.redis_user,
   password: config_default.redis_password,
@@ -693,15 +691,15 @@ var verifyUserEmail2 = catchAsync(async (req, res) => {
   const { accessToken, refreshToken: refreshToken3, user } = result;
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    secure: false,
-    sameSite: "none",
+    secure: config_default.node_env === "development" ? false : true,
+    sameSite: config_default.node_env === "development" ? "lax" : "none",
     maxAge: 1e3 * 60 * 60 * 24
     // 24 hour or 1 day
   });
   res.cookie("refreshToken", refreshToken3, {
     httpOnly: true,
-    secure: false,
-    sameSite: "none",
+    secure: config_default.node_env === "development" ? false : true,
+    sameSite: config_default.node_env === "development" ? "lax" : "none",
     maxAge: 1e3 * 60 * 60 * 24 * 7
     // 7 days
   });
@@ -722,15 +720,15 @@ var loginUser2 = catchAsync(async (req, res) => {
   const { accessToken, refreshToken: refreshToken3 } = result;
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    secure: false,
-    sameSite: "none",
+    secure: config_default.node_env === "development" ? false : true,
+    sameSite: config_default.node_env === "development" ? "lax" : "none",
     maxAge: 1e3 * 60 * 60 * 24
     // 24 hour or 1 day
   });
   res.cookie("refreshToken", refreshToken3, {
     httpOnly: true,
-    secure: false,
-    sameSite: "none",
+    secure: config_default.node_env === "development" ? false : true,
+    sameSite: config_default.node_env === "development" ? "lax" : "none",
     maxAge: 1e3 * 60 * 60 * 24 * 7
     // 7 days
   });
@@ -765,15 +763,15 @@ var refreshToken2 = catchAsync(async (req, res) => {
   const { accessToken, refreshToken: newRefreshToken } = result;
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    secure: false,
-    sameSite: "none",
+    secure: config_default.node_env === "development" ? false : true,
+    sameSite: config_default.node_env === "development" ? "lax" : "none",
     maxAge: 1e3 * 60 * 60 * 24
     // 24 hour or 1 day
   });
   res.cookie("refreshToken", newRefreshToken, {
     httpOnly: true,
-    secure: false,
-    sameSite: "none",
+    secure: config_default.node_env === "development" ? false : true,
+    sameSite: config_default.node_env === "development" ? "lax" : "none",
     maxAge: 1e3 * 60 * 60 * 24 * 7
     // 7 days
   });
@@ -807,6 +805,16 @@ var resetPassword2 = catchAsync(async (req, res) => {
     data: null
   });
 });
+var logout = catchAsync(async (req, res) => {
+  res.clearCookie("accessToken");
+  res.clearCookie("refreshToken");
+  sendResponse(res, {
+    statusCode: httpStatus2.OK,
+    success: true,
+    message: `User logged out successfully`,
+    data: null
+  });
+});
 var AuthController = {
   registerUser: registerUser2,
   verifyUserEmail: verifyUserEmail2,
@@ -814,7 +822,8 @@ var AuthController = {
   getMe: getMe2,
   refreshToken: refreshToken2,
   forgotPassword: forgotPassword2,
-  resetPassword: resetPassword2
+  resetPassword: resetPassword2,
+  logout
 };
 
 // src/app/middleware/validateRequest.ts
@@ -938,7 +947,7 @@ router.post(
 );
 router.get(
   "/me",
-  auth(Role.SUPER_ADMIN, Role.ADMIN, Role.CITIZEN),
+  auth(Role.SUPER_ADMIN, Role.ADMIN, Role.CITIZEN, Role.SERVICE_WORKER),
   AuthController.getMe
 );
 router.post("/refresh-token", AuthController.refreshToken);
@@ -952,6 +961,7 @@ router.post(
   validateRequest(UserValidation.ResetPasswordZodSchema),
   AuthController.resetPassword
 );
+router.post("/logout", AuthController.logout);
 var AuthRoutes = router;
 
 // src/app/middleware/globalErrorHandler.ts
@@ -1162,12 +1172,16 @@ var upload = multer({ storage });
 var router2 = Router2();
 router2.patch(
   "/profile-image",
-  auth(Role.SUPER_ADMIN, Role.ADMIN, Role.CITIZEN),
+  auth(Role.SUPER_ADMIN, Role.ADMIN, Role.CITIZEN, Role.SERVICE_WORKER),
   upload.single("profileImage"),
   UserController.uploadProfileImage
 );
 router2.get("/", auth(Role.SUPER_ADMIN, Role.ADMIN), UserController.getAllUsers);
-router2.patch("/:id", auth(Role.SUPER_ADMIN), UserController.updateUserRole);
+router2.patch(
+  "/:id",
+  auth(Role.SUPER_ADMIN, Role.ADMIN),
+  UserController.updateUserRole
+);
 var UserRoutes = router2;
 
 // src/app/module/complain/complain.route.ts
@@ -1505,7 +1519,6 @@ var initiateComplainPayment = async (complainId, userId) => {
       id: complainId
     }
   });
-  console.log(complain);
   if (complain.userId !== userId) {
     throw new AppError(
       httpStatus10.FORBIDDEN,
@@ -1651,9 +1664,7 @@ var verifyPayment = catchAsync(async (req, res) => {
     payload
   );
   if (result === "success") {
-    res.redirect(
-      `http://localhost:3000/tenant-dashboard/payment-success/${tranId}`
-    );
+    res.redirect(`http://localhost:3000/payment-success/${tranId}`);
   }
   sendResponse(res, {
     success: true,
@@ -2154,4 +2165,8 @@ async function main() {
   }
 }
 main();
+var server_default = app_default;
+export {
+  server_default as default
+};
 //# sourceMappingURL=server.js.map
