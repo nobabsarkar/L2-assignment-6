@@ -152,6 +152,13 @@ const getUserPayments = async (userId: string) => {
 
 const getAllPayments = async () => {
   const result = await prisma.payment.findMany({
+    include: {
+      complain: {
+        select: {
+          title: true,
+        },
+      },
+    },
     orderBy: {
       createdAt: "asc",
     },
