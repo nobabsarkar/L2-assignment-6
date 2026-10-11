@@ -1,5 +1,4 @@
 import type { AssignStatus } from "../../../../generated/prisma/enums";
-import { cloudinary } from "../../lib/cloudinary";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
 import httpStatus from "http-status";
