@@ -21,7 +21,8 @@ dotenv.config({ path: path.join(process.cwd(), ".env") });
 var config_default = {
   node_env: process.env.NODE_ENV,
   port: process.env.PORT,
-  app_url: process.env.APP_URL,
+  // app_url: process.env.APP_URL,
+  app_url: "https://level2-assignment-6.vercel.app",
   database_url: process.env.DATABASE_URL,
   frontend_url: process.env.FRONTEND_URL,
   bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,
@@ -1664,7 +1665,9 @@ var verifyPayment = catchAsync(async (req, res) => {
     payload
   );
   if (result === "success") {
-    res.redirect(`http://localhost:3000/payment-success/${tranId}`);
+    res.redirect(
+      `https://level2-assignment-7.vercel.app/payment-success/${tranId}`
+    );
   }
   sendResponse(res, {
     success: true,

@@ -8,6 +8,7 @@ export default {
 
   port: process.env.PORT,
   app_url: process.env.APP_URL,
+  // app_url: "https://level2-assignment-6.vercel.app",
 
   database_url: process.env.DATABASE_URL,
 

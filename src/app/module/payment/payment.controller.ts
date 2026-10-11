@@ -37,6 +37,9 @@ const verifyPayment = catchAsync(async (req, res) => {
 
   if (result === "success") {
     res.redirect(`http://localhost:3000/payment-success/${tranId}`);
+    // res.redirect(
+    //   `https://level2-assignment-7.vercel.app/payment-success/${tranId}`,
+    // );
   }
 
   sendResponse(res, {
