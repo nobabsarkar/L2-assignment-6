@@ -132,6 +132,10 @@ const startWork = async (
     return result;
   }
 
+  if (assignment?.status === "COMPLETED") {
+    throw new AppError(httpStatus.BAD_REQUEST, "Work is already completed");
+  }
+
   // Cannot complete work from this endpoint
   if (status === "COMPLETED") {
     throw new AppError(
