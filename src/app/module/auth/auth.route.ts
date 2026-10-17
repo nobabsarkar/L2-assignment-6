@@ -4,6 +4,7 @@ import { validateRequest } from "../../middleware/validateRequest";
 import { UserValidation } from "./auth.validation";
 import { Role } from "../../../../generated/prisma/enums";
 import { auth } from "../../middleware/checkAuth";
+import { upload } from "../../lib/multer";
 
 const router = Router();
 
@@ -29,6 +30,13 @@ router.get(
   "/me",
   auth(Role.SUPER_ADMIN, Role.ADMIN, Role.CITIZEN, Role.SERVICE_WORKER),
   AuthController.getMe,
+);
+
+router.patch(
+  "/update-user-profile",
+  upload.single("file"),
+  auth(Role.SUPER_ADMIN, Role.ADMIN, Role.CITIZEN, Role.SERVICE_WORKER),
+  AuthController.updateCurrentUserProfile,
 );
 
 router.post("/refresh-token", AuthController.refreshToken);

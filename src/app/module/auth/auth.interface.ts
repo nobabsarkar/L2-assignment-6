@@ -32,3 +32,11 @@ export interface IResetPasswordPayload {
   newPassword: string;
   otp: string;
 }
+
+export interface IUpdateCurrentUserProfile {
+  userId: string;
+  name?: string;
+  email?: string;
+  imageUrl?: string;
+  file?: Express.Multer.File;
+}

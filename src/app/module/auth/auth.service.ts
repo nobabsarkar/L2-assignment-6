@@ -7,6 +7,7 @@ import type {
   IRegisterUser,
   IRequestUser,
   IResetPasswordPayload,
+  IUpdateCurrentUserProfile,
   IVerifyEmailPayload,
 } from "./auth.interface";
 import crypto from "crypto";
@@ -19,6 +20,7 @@ import httpStatus from "http-status";
 import { Role, UserStatus } from "../../../../generated/prisma/enums";
 import { jwtUtils } from "../../utils/jwt";
 import type { JwtPayload, SignOptions } from "jsonwebtoken";
+import { sendImageToCloudinary } from "../../utils/sendImageToCloudinary";
 
 const registerUser = async (payload: IRegisterUser) => {
   const { name, password } = payload;
@@ -268,6 +270,51 @@ const getMe = async (user: IRequestUser) => {
   return isUserExists;
 };
 
+const updateCurrentUserProfile = async (
+  userId: string,
+  payload: IUpdateCurrentUserProfile,
+) => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new AppError(404, "User Not Found");
+  }
+
+  const { name, email, file } = payload;
+
+  let imageUrl = user.imageUrl;
+  let imagePublicId = user.imagePublicId;
+
+  if (file) {
+    const uploadedImage = await sendImageToCloudinary(
+      file.buffer,
+      "citycare/profiles",
+    );
+
+    imageUrl = uploadedImage.secure_url;
+    imagePublicId = uploadedImage.public_id;
+  }
+
+  return prisma.user.update({
+    where: { id: userId },
+    data: {
+      ...(name !== undefined && { name }),
+      ...(email !== undefined && { email }),
+      ...(file && { imageUrl, imagePublicId }),
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      imageUrl: true,
+      imagePublicId: true,
+      role: true,
+    },
+  });
+};
+
 const refreshToken = async (token: string) => {
   const verifiedRefreshToken = jwtUtils.verifyToken(
     token,
@@ -451,4 +498,5 @@ export const AuthService = {
   refreshToken,
   forgotPassword,
   resetPassword,
+  updateCurrentUserProfile,
 };

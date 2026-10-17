@@ -2,8 +2,8 @@ import config from "../../config";
 import { AppError } from "../../utils/AppError";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
-import { AuthService } from "./auth.service";
 import httpStatus from "http-status";
+import { AuthService } from "./auth.service";
 
 const registerUser = catchAsync(async (req, res) => {
   const payload = req.body;
@@ -96,6 +96,25 @@ const getMe = catchAsync(async (req, res) => {
   });
 });
 
+const updateCurrentUserProfile = catchAsync(async (req, res) => {
+  const userId = req?.user?.userId;
+
+  const payload =
+    typeof req.body.data === "string" ? JSON.parse(req.body.data) : req.body;
+
+  const result = await AuthService.updateCurrentUserProfile(userId as string, {
+    ...payload,
+    file: req.file,
+  });
+
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "User Profile Updated successfully",
+    data: result,
+  });
+});
+
 const refreshToken = catchAsync(async (req, res) => {
   if (!req.cookies.refreshToken) {
     throw new AppError(httpStatus.NOT_FOUND, "Refresh token is missing");
@@ -171,6 +190,7 @@ export const AuthController = {
   verifyUserEmail,
   loginUser,
   getMe,
+  updateCurrentUserProfile,
   refreshToken,
   forgotPassword,
   resetPassword,
