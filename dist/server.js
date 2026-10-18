@@ -21,8 +21,8 @@ dotenv.config({ path: path.join(process.cwd(), ".env") });
 var config_default = {
   node_env: process.env.NODE_ENV,
   port: process.env.PORT,
-  // app_url: process.env.APP_URL,
-  app_url: "https://level2-assignment-6.vercel.app",
+  app_url: process.env.APP_URL,
+  // app_url: "https://level2-assignment-6.vercel.app",
   database_url: process.env.DATABASE_URL,
   frontend_url: process.env.FRONTEND_URL,
   bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,
@@ -83,6 +83,9 @@ var sendResponse = (res, data) => {
     meta: data.meta
   });
 };
+
+// src/app/module/auth/auth.controller.ts
+import httpStatus2 from "http-status";
 
 // src/app/module/auth/auth.service.ts
 import bcrypt from "bcryptjs";
@@ -348,6 +351,34 @@ var jwtUtils = {
   verifyToken
 };
 
+// src/app/lib/cloudinary.ts
+import { v2 as Cloudinary } from "cloudinary";
+Cloudinary.config({
+  cloud_name: config_default.cloudinary_cloud_name,
+  api_key: config_default.cloudinary_cloud_key,
+  api_secret: config_default.cloudinary_cloud_secret
+});
+var cloudinary = Cloudinary;
+
+// src/app/utils/sendImageToCloudinary.ts
+var sendImageToCloudinary = async (buffer, folder) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder
+      },
+      (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      }
+    );
+    uploadStream.end(buffer);
+  });
+};
+
 // src/app/module/auth/auth.service.ts
 var registerUser = async (payload) => {
   const { name, password } = payload;
@@ -537,6 +568,41 @@ var getMe = async (user) => {
   }
   return isUserExists;
 };
+var updateCurrentUserProfile = async (userId, payload) => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId }
+  });
+  if (!user) {
+    throw new AppError(404, "User Not Found");
+  }
+  const { name, email, file } = payload;
+  let imageUrl = user.imageUrl;
+  let imagePublicId = user.imagePublicId;
+  if (file) {
+    const uploadedImage = await sendImageToCloudinary(
+      file.buffer,
+      "citycare/profiles"
+    );
+    imageUrl = uploadedImage.secure_url;
+    imagePublicId = uploadedImage.public_id;
+  }
+  return prisma.user.update({
+    where: { id: userId },
+    data: {
+      ...name !== void 0 && { name },
+      ...email !== void 0 && { email },
+      ...file && { imageUrl, imagePublicId }
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      imageUrl: true,
+      imagePublicId: true,
+      role: true
+    }
+  });
+};
 var refreshToken = async (token) => {
   const verifiedRefreshToken = jwtUtils.verifyToken(
     token,
@@ -671,11 +737,11 @@ var AuthService = {
   getMe,
   refreshToken,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  updateCurrentUserProfile
 };
 
 // src/app/module/auth/auth.controller.ts
-import httpStatus2 from "http-status";
 var registerUser2 = catchAsync(async (req, res) => {
   const payload = req.body;
   await AuthService.registerUser(payload);
@@ -756,6 +822,20 @@ var getMe2 = catchAsync(async (req, res) => {
     data: result
   });
 });
+var updateCurrentUserProfile2 = catchAsync(async (req, res) => {
+  const userId = req?.user?.userId;
+  const payload = typeof req.body.data === "string" ? JSON.parse(req.body.data) : req.body;
+  const result = await AuthService.updateCurrentUserProfile(userId, {
+    ...payload,
+    file: req.file
+  });
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "User Profile Updated successfully",
+    data: result
+  });
+});
 var refreshToken2 = catchAsync(async (req, res) => {
   if (!req.cookies.refreshToken) {
     throw new AppError(httpStatus2.NOT_FOUND, "Refresh token is missing");
@@ -821,6 +901,7 @@ var AuthController = {
   verifyUserEmail: verifyUserEmail2,
   loginUser: loginUser2,
   getMe: getMe2,
+  updateCurrentUserProfile: updateCurrentUserProfile2,
   refreshToken: refreshToken2,
   forgotPassword: forgotPassword2,
   resetPassword: resetPassword2,
@@ -929,6 +1010,11 @@ var auth = (...requiredRoles) => {
   });
 };
 
+// src/app/lib/multer.ts
+import multer from "multer";
+var storage = multer.memoryStorage();
+var upload = multer({ storage });
+
 // src/app/module/auth/auth.route.ts
 var router = Router();
 router.post(
@@ -950,6 +1036,12 @@ router.get(
   "/me",
   auth(Role.SUPER_ADMIN, Role.ADMIN, Role.CITIZEN, Role.SERVICE_WORKER),
   AuthController.getMe
+);
+router.patch(
+  "/update-user-profile",
+  upload.single("file"),
+  auth(Role.SUPER_ADMIN, Role.ADMIN, Role.CITIZEN, Role.SERVICE_WORKER),
+  AuthController.updateCurrentUserProfile
 );
 router.post("/refresh-token", AuthController.refreshToken);
 router.post(
@@ -1028,15 +1120,6 @@ import { Router as Router2 } from "express";
 
 // src/app/module/user/user.controller.ts
 import httpStatus7 from "http-status";
-
-// src/app/lib/cloudinary.ts
-import { v2 as Cloudinary } from "cloudinary";
-Cloudinary.config({
-  cloud_name: config_default.cloudinary_cloud_name,
-  api_key: config_default.cloudinary_cloud_key,
-  api_secret: config_default.cloudinary_cloud_secret
-});
-var cloudinary = Cloudinary;
 
 // src/app/module/user/user.service.ts
 import httpStatus6 from "http-status";
@@ -1163,11 +1246,6 @@ var UserController = {
   getAllUsers: getAllUsers2,
   updateUserRole: updateUserRole2
 };
-
-// src/app/lib/multer.ts
-import multer from "multer";
-var storage = multer.memoryStorage();
-var upload = multer({ storage });
 
 // src/app/module/user/user.route.ts
 var router2 = Router2();
@@ -1334,17 +1412,39 @@ var adminGetAllComplains = async (query) => {
       }
     });
   }
-  const result = await prisma.complain.findMany({
-    where: {
-      AND: andConditions
-    },
-    take: limit,
-    skip,
-    orderBy: {
-      [sortBy]: sortOrder
+  if (query.location) {
+    andConditions.push({
+      location: {
+        contains: query.location,
+        mode: "insensitive"
+      }
+    });
+  }
+  const whereConditions = {
+    AND: andConditions
+  };
+  const [result, total] = await Promise.all([
+    prisma.complain.findMany({
+      where: whereConditions,
+      take: limit,
+      skip,
+      orderBy: {
+        [sortBy]: sortOrder
+      }
+    }),
+    prisma.complain.count({
+      where: whereConditions
+    })
+  ]);
+  return {
+    data: result,
+    meta: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit)
     }
-  });
-  return result;
+  };
 };
 var adminUpdateComplainStatus = async (complainId, status) => {
   const complain = await prisma.complain.findUnique({
@@ -1624,6 +1724,13 @@ var getUserPayments = async (userId) => {
 };
 var getAllPayments = async () => {
   const result = await prisma.payment.findMany({
+    include: {
+      complain: {
+        select: {
+          title: true
+        }
+      }
+    },
     orderBy: {
       createdAt: "asc"
     }
@@ -1665,9 +1772,7 @@ var verifyPayment = catchAsync(async (req, res) => {
     payload
   );
   if (result === "success") {
-    res.redirect(
-      `https://level2-assignment-7.vercel.app/payment-success/${tranId}`
-    );
+    res.redirect(`http://localhost:3000/payment-success/${tranId}`);
   }
   sendResponse(res, {
     success: true,
@@ -1730,27 +1835,6 @@ import httpStatus13 from "http-status";
 
 // src/app/module/assign/assign.service.ts
 import httpStatus12 from "http-status";
-
-// src/app/utils/sendImageToCloudinary.ts
-var sendImageToCloudinary = async (buffer, folder) => {
-  return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      {
-        folder
-      },
-      (error, result) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(result);
-        }
-      }
-    );
-    uploadStream.end(buffer);
-  });
-};
-
-// src/app/module/assign/assign.service.ts
 var assignServiceWorker = async (complainId, serviceWorkerId) => {
   const complain = await prisma.complain.findUnique({
     where: {
@@ -1850,6 +1934,9 @@ var startWork = async (assignId, serviceWorkerId, status) => {
       }
     });
     return result;
+  }
+  if (assignment?.status === "COMPLETED") {
+    throw new AppError(httpStatus12.BAD_REQUEST, "Work is already completed");
   }
   if (status === "COMPLETED") {
     throw new AppError(
@@ -2107,22 +2194,23 @@ import bcrypt2 from "bcryptjs";
 import httpstatus from "http-status";
 var seedSuperAdmin = async () => {
   try {
-    const isSuperAdminExist = await prisma.user.findFirst({
-      where: {
-        role: Role.SUPER_ADMIN
-      }
-    });
-    if (isSuperAdminExist) {
-      throw new AppError(httpstatus.CONFLICT, "Super Admin already exists");
-    }
     const name = config_default.super_admin_name;
     const email = config_default.super_admin_email;
     const password = config_default.super_admin_password;
     if (!name || !email || !password) {
       throw new AppError(
         httpstatus.NOT_FOUND,
-        "Super Admin Name , Email, Password is Missing."
+        "Super Admin Name, Email, or Password is Missing."
       );
+    }
+    const isSuperAdminExist = await prisma.user.findFirst({
+      where: {
+        role: Role.SUPER_ADMIN
+      }
+    });
+    if (isSuperAdminExist) {
+      console.log("Super Admin already exists. Skipping seeding.");
+      return;
     }
     const hashedPassword = await bcrypt2.hash(
       password,
@@ -2136,16 +2224,18 @@ var seedSuperAdmin = async () => {
         password: hashedPassword,
         needPasswordChange: false,
         emailVerified: true
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true
       }
     });
-    console.log("Super Admin Created : ", superAdmin);
+    console.log("Super Admin Created:", superAdmin);
   } catch (error) {
-    console.log("Error Seeding Super Admin : ", error);
-    await prisma.user.delete({
-      where: {
-        email: config_default.super_admin_email
-      }
-    });
+    console.error("Error Seeding Super Admin:", error);
+    throw error;
   }
 };
 
